@@ -11,6 +11,7 @@ declare module 'vue' {
     AppFooter: typeof import('./components/AppFooter.vue')['default']
     Form: typeof import('./components/Form.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
+    Notify: typeof import('./components/Notify.vue')['default']
     PictureUpload: typeof import('./components/PictureUpload.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

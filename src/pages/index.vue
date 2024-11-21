@@ -5,6 +5,7 @@
 <template>
   <v-responsive>
     <Form/>
+    <Notify/>
   </v-responsive>
 </template>
 

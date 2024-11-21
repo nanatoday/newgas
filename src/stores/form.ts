@@ -11,6 +11,7 @@ export const useFormStore = defineStore("formStore", () => {
   const activeEmail = ref<string | null>(null);
   const balance = ref<number>(0);
   const imageError = ref<string | null>(null)
+  const notify = ref<boolean>(false)
 
   const rules = ref({
     required: (val: string) => {
@@ -108,6 +109,7 @@ export const useFormStore = defineStore("formStore", () => {
     verificationState,
     activeEmail,
     resetFormStore,
-    imageError
+    imageError,
+    notify
   };
 });

@@ -11,31 +11,11 @@ const email = ref<string>('')
 const phone = ref<string>('')
 const address = ref<string>('')
 const id = ref<string>('')
-const test = ref()
 
-const handleFrontImage = (val:any) => {
-    test.value = val
-}
-
-const handleBackImage = (val:any) => {
-    backImage.value = val
-}
-
-const resetForm = () => {
-    frontImage.value = null
-    backImage.value = null
-    name.value = ''
-    email.value = ''
-    phone.value = ''
-    address.value = ''
-    id.value = ''
-}
 
 const submitForm = async() => {
     formStore.loading = true
     const formData = new FormData();
-
-    console.log(frontImage.value, backImage.value)
 
     formData.append("id_card_front", frontImage.value)
     formData.append("id_card_back", backImage.value)
@@ -47,20 +27,31 @@ const submitForm = async() => {
 
     await postRequestHandler('customers/onboard', formData, true)
     .then(res => {
-        console.log(res)
-        resetForm()
+        formStore.notify = true
     })
-    .catch((error) => console.log(error))
+    .catch((error) => {
+        formStore.error = error
+        console.error(error)
+    })
     .finally(() => formStore.loading = false)
 }
+
+watchEffect(() => {
+    if(name.value && phone.value && id.value && frontImage.value && backImage.value){
+        disabled.value = false
+    } else {
+        disabled.value = true
+    }
+})
 </script>
 
 <template>
-    <v-container class="mt-10">
+    <v-container class="mt-16">
         <v-card max-width="700" class="mx-auto">
             <v-toolbar title="Newgas Form" class="bg-newgas"/>
             <v-form @submit.prevent="submitForm">
                 <v-card-text>
+                    <p class="text-error">{{ formStore.error }}</p>
                     <div>
                         <p class="text-body-1 mb-1">Name*</p>
                         <v-text-field variant="outlined" density="comfortable" v-model="name" :rules="[formStore.rules.required]" placeholder="Eg. Isaac Ernest"/>
@@ -95,7 +86,7 @@ const submitForm = async() => {
                     </v-row>
                 </v-card-text>
                 <v-card-actions class="px-5 pb-5">
-                    <v-btn type="submit" text="Submit" class="bg-newgas" size="large" :loading="formStore.loading" block/>
+                    <v-btn type="submit" text="Submit" class="bg-newgas" size="large" :loading="formStore.loading" :disabled="disabled" block/>
                 </v-card-actions>
             </v-form>
         </v-card>
