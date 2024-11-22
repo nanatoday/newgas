@@ -30,7 +30,7 @@ const submitForm = async() => {
         formStore.notify = true
     })
     .catch((error) => {
-        formStore.error = error
+        formStore.error = `Error, please try again`
         console.error(error)
     })
     .finally(() => formStore.loading = false)
