@@ -48,29 +48,29 @@ watchEffect(() => {
 <template>
     <v-container class="mt-16">
         <v-card max-width="700" class="mx-auto">
-            <v-toolbar title="Newgas Form" class="bg-newgas"/>
+            <v-toolbar title="Newgas Customer Registration Form" class="bg-newgas"/>
             <v-form @submit.prevent="submitForm">
                 <v-card-text>
                     <p class="text-error">{{ formStore.error }}</p>
                     <div>
                         <p class="text-body-1 mb-1">Name*</p>
-                        <v-text-field variant="outlined" density="comfortable" v-model="name" :rules="[formStore.rules.required]" placeholder="Eg. Isaac Ernest"/>
+                        <v-text-field variant="outlined" density="comfortable" v-model="name" :rules="[formStore.rules.required]" placeholder="Eg. Kwadwo Mensah"/>
                     </div>
                     <div>
                         <p class="text-body-1 mb-1">Email</p>
-                        <v-text-field variant="outlined" density="comfortable" v-model="email" placeholder="Eg. isaacernest@gmail.com"/>
+                        <v-text-field variant="outlined" density="comfortable" v-model="email" placeholder="Eg. kwadwomensah@example.com"/>
                     </div>
                     <div>
                         <p class="text-body-1 mb-1">Phone Number*</p>
-                        <v-text-field variant="outlined" density="comfortable" v-model="phone" :rules="[formStore.rules.phoneNumber]" placeholder="Eg. 0244567893"/>
+                        <v-text-field variant="outlined" density="comfortable" v-model="phone" :rules="[formStore.rules.phoneNumber]" placeholder="Eg. 024xxxxxxx"/>
                     </div>
                     <div>
                         <p class="text-body-1 mb-1">Digital Address</p>
-                        <v-text-field variant="outlined" density="comfortable" v-model="address" placeholder="Eg. BS-2345-0994"/>
+                        <v-text-field variant="outlined" density="comfortable" v-model="address" placeholder="Eg. BS-xxxx-xxxx"/>
                     </div>
                     <div>
                         <p class="text-body-1 mb-1">Ghana Card ID*</p>
-                        <v-text-field variant="outlined" density="comfortable" v-model="id" :rules="[formStore.rules.required]" placeholder="Eg. GHA-678091234-6"/>
+                        <v-text-field variant="outlined" density="comfortable" v-model="id" :rules="[formStore.rules.required]" placeholder="Eg. GHA-xxxxxxxxx-x"/>
                     </div>
 
                     <p class="text-body-1 mb-1" @click="console.log(frontImage)">Upload Ghana Card*</p>
