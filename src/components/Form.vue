@@ -10,34 +10,39 @@ const name = ref<string>('')
 const email = ref<string>('')
 const phone = ref<string>('')
 const address = ref<string>('')
+const agent = ref<string>('')
 const id = ref<string>('')
+const route = useRoute()
 
 
-const submitForm = async() => {
+const submitForm = async () => {
     formStore.loading = true
     const formData = new FormData();
 
+    formData.append("agent_code", agent.value)
     formData.append("id_card_front", frontImage.value)
     formData.append("id_card_back", backImage.value)
     formData.append("name", name.value)
     formData.append("phone", phone.value)
     formData.append("id_card_number", id.value)
     formData.append("digital_address", address.value)
-    formData.append("emaail", email.value)
+    formData.append("email", email.value)
 
     await postRequestHandler('customers/onboard', formData, true)
-    .then(res => {
-        formStore.notify = true
-    })
-    .catch((error) => {
-        formStore.error = `Error, please try again`
-        console.error(error)
-    })
-    .finally(() => formStore.loading = false)
+        .then(res => {
+            formStore.notify = true
+        })
+        .catch((error) => {
+            formStore.error = `Error, please try again`
+            console.error(error)
+        })
+        .finally(() => formStore.loading = false)
 }
 
 watchEffect(() => {
-    if(name.value && phone.value && id.value && frontImage.value && backImage.value){
+    if (name.value && phone.value && id.value && frontImage.value && backImage.value) {
+        disabled.value = false
+    } else if (name.value && phone.value && id.value && frontImage.value && backImage.value && agent.value) {
         disabled.value = false
     } else {
         disabled.value = true
@@ -48,45 +53,56 @@ watchEffect(() => {
 <template>
     <v-container class="mt-16">
         <v-card max-width="700" class="mx-auto">
-            <v-toolbar title="Newgas Customer Registration Form" class="bg-newgas"/>
+            <v-toolbar title="Newgas Customer Registration Form" class="bg-newgas" />
             <v-form @submit.prevent="submitForm">
                 <v-card-text>
                     <p class="text-error">{{ formStore.error }}</p>
+                    <div v-if="route.query.agent == 'true' || route.query.agent == '1'">
+                        <p class="text-body-1 mb-1">Agent Code*</p>
+                        <v-text-field variant="outlined" density="comfortable" v-model="agent"
+                            :rules="[formStore.rules.required]" placeholder="Eg. xxxx" />
+                    </div>
                     <div>
                         <p class="text-body-1 mb-1">Name*</p>
-                        <v-text-field variant="outlined" density="comfortable" v-model="name" :rules="[formStore.rules.required]" placeholder="Eg. Kwadwo Mensah"/>
+                        <v-text-field variant="outlined" density="comfortable" v-model="name"
+                            :rules="[formStore.rules.required]" placeholder="Eg. Kwadwo Mensah" />
                     </div>
                     <div>
                         <p class="text-body-1 mb-1">Email</p>
-                        <v-text-field variant="outlined" density="comfortable" v-model="email" placeholder="Eg. kwadwomensah@example.com"/>
+                        <v-text-field variant="outlined" density="comfortable" v-model="email"
+                            placeholder="Eg. kwadwomensah@example.com" />
                     </div>
                     <div>
                         <p class="text-body-1 mb-1">Phone Number*</p>
-                        <v-text-field variant="outlined" density="comfortable" v-model="phone" :rules="[formStore.rules.phoneNumber]" placeholder="Eg. 024xxxxxxx"/>
+                        <v-text-field variant="outlined" density="comfortable" v-model="phone"
+                            :rules="[formStore.rules.phoneNumber]" placeholder="Eg. 024xxxxxxx" />
                     </div>
                     <div>
                         <p class="text-body-1 mb-1">Digital Address</p>
-                        <v-text-field variant="outlined" density="comfortable" v-model="address" placeholder="Eg. BS-xxxx-xxxx"/>
+                        <v-text-field variant="outlined" density="comfortable" v-model="address"
+                            placeholder="Eg. BS-xxxx-xxxx" />
                     </div>
                     <div>
                         <p class="text-body-1 mb-1">Ghana Card ID*</p>
-                        <v-text-field variant="outlined" density="comfortable" v-model="id" :rules="[formStore.rules.required]" placeholder="Eg. GHA-xxxxxxxxx-x"/>
+                        <v-text-field variant="outlined" density="comfortable" v-model="id"
+                            :rules="[formStore.rules.required]" placeholder="Eg. GHA-xxxxxxxxx-x" />
                     </div>
 
                     <p class="text-body-1 mb-1" @click="console.log(frontImage)">Upload Ghana Card*</p>
                     <v-row>
                         <v-col cols="12" md="6" sm="6">
-                            <PictureUpload v-model="frontImage" side="front"/> 
+                            <PictureUpload v-model="frontImage" side="front" />
                             <p class="text-error">{{ formStore.imageError }}</p>
                         </v-col>
                         <v-col cols="12" md="6" sm="6">
-                            <PictureUpload v-model="backImage" side="back"/>
+                            <PictureUpload v-model="backImage" side="back" />
                             <p class="text-error">{{ formStore.imageError }}</p>
-                        </v-col>                
+                        </v-col>
                     </v-row>
                 </v-card-text>
                 <v-card-actions class="px-5 pb-5">
-                    <v-btn type="submit" text="Submit" class="bg-newgas" size="large" :loading="formStore.loading" :disabled="disabled" block/>
+                    <v-btn type="submit" text="Submit" class="bg-newgas" size="large" :loading="formStore.loading"
+                        :disabled="disabled" block />
                 </v-card-actions>
             </v-form>
         </v-card>
