@@ -29,4 +29,4 @@ RUN find /app -mindepth 1 ! -regex '^/app/dist\(/.*\)?' -delete
 # expose port
 EXPOSE 9000
 
-CMD [ "http-server", "dist", "-p", "9000", "--proxy", "http://localhost:9000"]
+CMD [ "http-server", "dist", "-p", "9000", "--proxy", "http://localhost:9000?"]
