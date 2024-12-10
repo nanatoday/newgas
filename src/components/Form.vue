@@ -1,19 +1,26 @@
 <script setup lang="ts">
-import { useFormStore } from '@/stores/form';
-import { postRequestHandler } from '@/utils/httpHandler';
+import { useFormStore } from "@/stores/form";
+import { postRequestHandler } from "@/utils/httpHandler";
+import { onMounted } from "vue";
 
-const formStore = useFormStore()
-const disabled = ref<boolean>(true)
-const frontImage = ref<any>()
-const backImage = ref<any>()
-const name = ref<string>('')
-const email = ref<string>('')
-const phone = ref<string>('')
-const address = ref<string>('')
-const agent = ref<string>('')
-const id = ref<string>('')
-const route = useRoute()
+const formStore = useFormStore();
+const disabled = ref<boolean>(true);
+const frontImage = ref<any>();
+const backImage = ref<any>();
+const name = ref<string>("");
+const email = ref<string>("");
+const phone = ref<string>("");
+const address = ref<string>("");
+const agent = ref<string>("");
+const id = ref<string>("");
+const route = useRoute();
 
+// Capture the query parameter when the component mounts
+onMounted(() => {
+  if (route.query.agent) {
+    agent.value = route.query.agent as string;
+  }
+});
 
 const submitForm = async () => {
     formStore.loading = true
