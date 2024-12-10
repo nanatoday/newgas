@@ -56,7 +56,7 @@ watchEffect(() => {
             <v-toolbar title="Newgas Customer Registration Form" class="bg-newgas" />
             <v-form @submit.prevent="submitForm">
                 <v-card-text>
-                    <p class="text-error">{{ formStore.error }}</p>
+                    <p class="text-error text-body-1 font-weight-bold text-center">{{ formStore.error }}</p>
                     <div v-if="route.query.agent == 'true' || route.query.agent == '1'">
                         <p class="text-body-1 mb-1">Agent Code*</p>
                         <v-text-field variant="outlined" density="comfortable" v-model="agent"
