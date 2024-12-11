@@ -91,7 +91,7 @@ const formCheck = () => {
                     <div>
                         <p class="text-body-1 mb-1">ID Type*</p>
                         <v-select variant="outlined" density="comfortable" v-model="idType" placeholder="Eg. Passport"
-                            :items="[{ title: 'Ghana Card', value: 'gh_card' }, { title: 'Passport', value: 'passport' }, { title: 'Drivers License', value: 'driver_license' }]"
+                            :items="[{ title: 'Ghana Card', value: 'gh_card' }, { title: 'Passport', value: 'passport' }]"
                             item-title="title" item-value="value" :rules="[formStore.rules.required]" @update:model-value="formCheck"/>
                     </div>
                     <div v-if="idType == 'gh_card'">
@@ -122,7 +122,7 @@ const formCheck = () => {
                             <PictureUpload v-model="frontImage" side="Bio Page" class="w-100" />
                         </div>
                     </div>
-                    <div v-if="idType == 'driver_license'">
+                    <!-- <div v-if="idType == 'driver_license'">
                         <div>
                             <p class="text-body-1 mb-1">Driver's License ID*</p>
                             <v-text-field variant="outlined" density="comfortable" v-model="ghanaCard"
@@ -132,7 +132,7 @@ const formCheck = () => {
                         <div class="text-center">
                             <PictureUpload v-model="frontImage" side="front" />
                         </div>
-                    </div>
+                    </div> -->
                 </v-card-text>
                 <v-card-actions class="px-5 pb-5">
                     <v-btn type="submit" text="Submit" class="bg-newgas" size="large" :loading="formStore.loading"
