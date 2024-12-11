@@ -51,13 +51,13 @@ watch(
 </script>
 
 <template>
-    <v-responsive max-width="400">
+    <v-responsive>
         <v-card >
             <v-card-text rounded="lg">
                 <div class="border-opacity-25 cursor-pointer rounded-lg d-flex align-center justify-center"
                     :style="{ 'background-image': `url(${imageDataUrl})` }" style="
                           background-position: center center;
-                          background-size: cover;
+                          background-size: contain;
                           background-color: #F8F8F8;
                           width: 100%;
                           height: 200px;
