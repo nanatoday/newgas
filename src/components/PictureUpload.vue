@@ -67,7 +67,7 @@ watch(
                             <span class="text-body-1 text-center">Click here to upload {{ side }} picture</span>
                         </div>
                     <v-file-input v-show="false"  v-model="picture[0]" @update:model-value="(val) => $emit('update:modelValue', val)" ref="fileInput1"
-                        accept="image/png,image/jpeg" :rules="[formStore.rules.images]"/>
+                        accept="image/png,image/jpeg"/>
                 </div>
             </v-card-text>
         </v-card>

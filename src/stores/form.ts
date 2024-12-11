@@ -10,7 +10,7 @@ export const useFormStore = defineStore("formStore", () => {
   const verificationState = ref<boolean>(false);
   const activeEmail = ref<string | null>(null);
   const balance = ref<number>(0);
-  const imageError = ref<string | null>(null)
+  // const imageError = ref<string | null>(null)
   const notify = ref<boolean>(false)
 
   const rules = ref({
@@ -54,20 +54,20 @@ export const useFormStore = defineStore("formStore", () => {
       }
       return "Must be a valid phone number";
     },
-    images: (val:any) => {
-      if(!val || !val.length || val[0].size < 2000000 ) {
-        return true
-      } else{
-        return imageError.value = "Must be an image file"; 
-      }
-    }
+    // images: (val:any) => {
+    //   if(!val || !val.length || val[0].size < 2000000 ) {
+    //     return true
+    //   } else{
+    //     return imageError.value = "Must be an image file"; 
+    //   }
+    // }
   });
 
-  watch(() => imageError, () => {
-    if(imageError.value) {
-      setTimeout(() => {imageError.value = ''}, 10000) 
-    }
-  }, {deep:true})
+  // watch(() => imageError, () => {
+  //   if(imageError.value) {
+  //     setTimeout(() => {imageError.value = ''}, 10000) 
+  //   }
+  // }, {deep:true})
 
   // // reset form if route changes
   // const router = useRouter();
@@ -109,7 +109,6 @@ export const useFormStore = defineStore("formStore", () => {
     verificationState,
     activeEmail,
     resetFormStore,
-    imageError,
     notify
   };
 });

@@ -105,11 +105,9 @@ const formCheck = () => {
                         <v-row>
                             <v-col cols="12" md="6" sm="6">
                                 <PictureUpload v-model="frontImage" side="front" />
-                                <p class="text-error">{{ formStore.imageError }}</p>
                             </v-col>
                             <v-col cols="12" md="6" sm="6">
                                 <PictureUpload v-model="backImage" side="back" />
-                                <p class="text-error">{{ formStore.imageError }}</p>
                             </v-col>
                         </v-row>
                     </div>
@@ -122,7 +120,6 @@ const formCheck = () => {
                         <p class="text-body-1 mb-1">Upload Passport Bio Page*</p>
                         <div class="w-100">
                             <PictureUpload v-model="frontImage" side="Bio Page" class="w-100" />
-                            <p class="text-error">{{ formStore.imageError }}</p>
                         </div>
                     </div>
                     <div v-if="idType == 'driver_license'">
@@ -134,7 +131,6 @@ const formCheck = () => {
                         <p class="text-body-1 mb-1">Upload Driver's License*</p>
                         <div class="text-center">
                             <PictureUpload v-model="frontImage" side="front" />
-                            <p class="text-error">{{ formStore.imageError }}</p>
                         </div>
                     </div>
                 </v-card-text>
