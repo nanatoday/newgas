@@ -47,6 +47,7 @@ const submitForm = async () => {
 const formCheck = () => {
     frontImage.value = undefined
     backImage.value = undefined
+    ghanaCard.value = ''
    if(idType.value == 'gh_card') {
     ghCardNotSelected.value = false
    } else {
