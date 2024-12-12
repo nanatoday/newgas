@@ -1,27 +1,26 @@
 <script setup lang="ts">
 import { useFormStore } from '@/stores/form';
+import { useDisplay } from 'vuetify';
+const { xs } = useDisplay()
 
 const formStore = useFormStore()
 
 const refresh = () => {
-    formStore.notify = false
-    window.location.reload()
+  formStore.notify = false
+  window.location.reload()
 }
 </script>
 
 <template>
-   <v-dialog
-    v-model="formStore.notify"
-    persistent
-    transition="dialog-top-transition"
-  >
-    <v-card width="400" class="mx-auto pa-3 text-center">
-        <v-card-text>
-            <p class="text-h6">Form Submitted Successfully</p>
-            <div class="mt-7 text-center">
-                <v-btn text="Close" color="newgas" @click="refresh"/>
-            </div>
-        </v-card-text>
+  <v-dialog v-model="formStore.notify" persistent transition="dialog-top-transition">
+    <v-card max-width="400" class="mx-auto text-center" :class="xs ? 'pa-1' : 'pa-3'">
+      <v-card-text>
+        <p class="text-body-1 font-weight-bold" v-if="xs">Form Submitted Successfully</p>
+        <p class="text-h6" v-else>Form Submitted Successfully</p>
+        <div :class="xs ? 'mt-5' : 'mt-7'" class=" text-center">
+          <v-btn text="Close" color="newgas" @click="refresh" />
+        </div>
+      </v-card-text>
     </v-card>
   </v-dialog>
 </template>

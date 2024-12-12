@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { useFormStore } from '@/stores/form';
+import { useUiStore } from '@/stores/ui';
 import { postRequestHandler } from '@/utils/httpHandler';
+import { useDisplay } from 'vuetify';
 
 const formStore = useFormStore()
+const uiStore = useUiStore()
 const form = ref<boolean>(false)
 const frontImage = ref<any>()
 const backImage = ref<any>()
@@ -15,7 +18,7 @@ const ghanaCard = ref<string>('')
 const idType = ref<string>('')
 const ghCardNotSelected = ref<boolean>(true)
 const route = useRoute()
-
+const { smAndDown } = useDisplay()
 
 const submitForm = async () => {
     formStore.loading = true
@@ -38,8 +41,8 @@ const submitForm = async () => {
             formStore.notify = true
         })
         .catch((error) => {
-            formStore.error = `Error, please try again`
-            console.error(error)
+            uiStore.alert = true
+            uiStore.alertText = "Submission failed, Please try again"
         })
         .finally(() => formStore.loading = false)
 }
@@ -55,19 +58,25 @@ const formCheck = () => {
    }
 }
 
+onMounted(() => {
+    if(route.query?.agent_code) {
+        agent.value = route.query?.agent_code as string
+    }
+})
+
 </script>
 
 <template>
-    <v-container class="mt-16">
+    <v-container :class="smAndDown? 'mt-10' : 'mt-16'">
         <v-card max-width="700" class="mx-auto">
-            <v-toolbar title="Newgas Customer Registration Form" class="bg-newgas" />
+            <v-toolbar title="Customer Registration" class="bg-newgas text-black" />
             <v-form @submit.prevent="submitForm" v-model="form">
                 <v-card-text>
                     <p class="text-error text-body-1 font-weight-bold text-center">{{ formStore.error }}</p>
-                    <div v-if="route.query.agent == 'true' || route.query.agent == '1'">
+                    <div v-if="route.query?.agent_code">
                         <p class="text-body-1 mb-1">Agent Code*</p>
                         <v-text-field variant="outlined" density="comfortable" v-model="agent"
-                            :rules="[formStore.rules.required]" placeholder="Eg. xxxx" />
+                            :rules="[formStore.rules.required]" placeholder="Eg. xxxx" disabled/>
                     </div>
                     <div>
                         <p class="text-body-1 mb-1">Name*</p>
