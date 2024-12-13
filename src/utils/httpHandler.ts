@@ -35,7 +35,6 @@ const errorHandler = (error: any) => {
     if (error.response.data.detail) {
       return Promise.reject(error.response.data.detail)
     }
-    return Promise.reject(error.response.data.detail)
   }
 
   return Promise.reject(error.message)

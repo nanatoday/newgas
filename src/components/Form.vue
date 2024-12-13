@@ -19,6 +19,9 @@ const idType = ref<string>('')
 const ghCardNotSelected = ref<boolean>(true)
 const route = useRoute()
 const { smAndDown } = useDisplay()
+const agentCode = ref<any>(localStorage.getItem('agent_code') ?? undefined)
+
+
 
 const submitForm = async () => {
     formStore.loading = true
@@ -36,13 +39,17 @@ const submitForm = async () => {
     formData.append("digital_address", address.value)
     formData.append("email", email.value)
 
+    if(agent.value){
+        localStorage.setItem('agent_code', agent.value)
+    }
+    
     await postRequestHandler('customers/onboard', formData, true)
-        .then(res => {
+    .then(res => {
             formStore.notify = true
         })
         .catch((error) => {
             uiStore.alert = true
-            uiStore.alertText = "Submission failed, Please try again"
+            uiStore.alertText = error
         })
         .finally(() => formStore.loading = false)
 }
@@ -59,8 +66,10 @@ const formCheck = () => {
 }
 
 onMounted(() => {
-    if(route.query?.agent_code) {
-        agent.value = route.query?.agent_code as string
+    if(route.query?.agent == 'true' || route.query?.agent == '1') {
+        if(localStorage.getItem('agent_code')) {
+            agent.value = agentCode.value
+        }
     }
 })
 
@@ -73,10 +82,10 @@ onMounted(() => {
             <v-form @submit.prevent="submitForm" v-model="form">
                 <v-card-text>
                     <p class="text-error text-body-1 font-weight-bold text-center">{{ formStore.error }}</p>
-                    <div v-if="route.query?.agent_code">
+                    <div v-if="route.query?.agent == 'true' || route.query?.agent == '1'">
                         <p class="text-body-1 mb-1">Agent Code*</p>
                         <v-text-field variant="outlined" density="comfortable" v-model="agent"
-                            :rules="[formStore.rules.required]" placeholder="Eg. xxxx" disabled/>
+                            :rules="[formStore.rules.required]" placeholder="Eg. xxxx" :disabled="agentCode !== undefined"/>
                     </div>
                     <div>
                         <p class="text-body-1 mb-1">Name*</p>
