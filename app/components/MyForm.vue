@@ -68,7 +68,7 @@ const agentCode = ref<any>();
 const submitForm = async () => {
   const formData = new FormData();
 
-  formData.append("agent_code", agent.value);
+  formData.append("agent_code", agent.value.toUpperCase());
   formData.append("id_card_front", frontImage.value);
   if (backImage.value) {
     formData.append("id_card_back", backImage.value);

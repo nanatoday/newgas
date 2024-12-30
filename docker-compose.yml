@@ -1,0 +1,8 @@
+services:
+  cylinder-onboarding-webform:
+    build: .
+    container_name: cylinder-onboarding-webform
+    ports:
+      - ${EXTERNAL_PORT}:${LOCAL_PORT}
+    env_file:
+      - .env
