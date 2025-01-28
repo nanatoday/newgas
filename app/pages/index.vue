@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 //
 useHead({
-  title: "NewGas Customer Registration",
+  title: "Newgas Onboarding",
 });
 </script>
 <template>
-  <v-responsive class="fill-height align-center">
+  <v-responsive class="fill-height">
     <MyForm />
   </v-responsive>
 </template>

@@ -1,18 +1,16 @@
-<template>
-  <v-app-bar flat class="bg-newgas">
-    <template v-slot:prepend>
-      <a href="https://newgas.online/">
-      <v-img src="~/assets/NewgasFinalLogo.png" width="30px" height="30px"></v-img>
-    </a>
-    </template>
-    <v-app-bar-title class="font-weight-regular">
-      <a class="text-white" style="text-decoration: none;" href="https://newgas.online/">
-      NEWGAS
-    </a>
-    </v-app-bar-title>
-  </v-app-bar>
-</template>
+<script setup lang="ts">
+import { useDisplay } from 'vuetify';
 
-<script lang="ts" setup>
-//
+const { xs,smAndDown } = useDisplay()
 </script>
+
+<template>
+    <v-app-bar class=" bg-newgas" :class="xs ? 'px-2' : 'px-8', xs? 'pa-0' : 'pa-1'">
+        <template v-slot:prepend>
+            <a href="https://newgas.online" class="d-flex align-center text-decoration-none text-white">
+                <v-img src="~/assets/NewgasFinalLogo.png" alt="Newgas Logo" :width="smAndDown ? '40' : '50'"/>
+                <p class="text-h6 ml-3">NEWGAS</p>
+            </a>
+        </template>
+    </v-app-bar>
+</template>
