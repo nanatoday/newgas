@@ -228,7 +228,6 @@ onMounted(async () => {
     loading.value = true;
 
     try {
-      uiStore.loading = true;
       const data = await $fetch(`/api/verify-token/${route.query?.token}`, {
         method: "get",
         headers: { "API-KEY": runtimeConfig["public"]["apiKey"] },
@@ -332,7 +331,7 @@ onMounted(async () => {
                   </p>
                   <div class="d-flex align-center" :class="xs ? 'ga-0' : 'ga-5'">
                     <v-otp-input v-model="otp" />
-                    <v-btn icon="mdi-send-variant" variant="text" color="newgas" v-if="xs"/>
+                    <v-btn icon="mdi-send-variant" variant="text" color="newgas" @click="verifyOTP" v-if="xs" :loading="formStore.loading"/>
                     <v-btn
                       text="Submit"
                       color="newgas"
@@ -477,51 +476,60 @@ onMounted(async () => {
       <v-window v-model="existingCustomer">
         <v-window-item :value="1">
           <v-container :class="smAndDown ? 'mt-16' : 'mt-16'">
-            <v-card max-width="500" class="mx-auto text-center" elevation="5">
-              <v-card-text>
-                <div class="d-flex align-center justify-center ga-2 mb-6 mt-6">
-                  <p class="text-body-1 font-weight-bold">
-                    Phone number {{ phone }} verified
-                  </p>
-                  <v-icon icon="mdi-check-circle" color="success" />
-                </div>
-                <div class="d-flex align-center justify-center ga-2 mb-6">
-                  <p class="text-body-1 font-weight-bold">
-                    ID verification pending
-                  </p>
-                  <v-icon icon="mdi-dots-circle" color="warning" />
-                </div>
-                <div class="d-flex align-center justify-center ga-2 mb-6">
-                  <p class="text-body-1 font-weight-bold">
-                    GPS verification pending
-                  </p>
-                  <v-icon icon="mdi-dots-circle" color="warning" />
-                </div>
-              </v-card-text>
-              <!-- <div class="pb-5 ">
-                                    <v-btn type="submit" text="Ok" class="bg-newgas"
-                                        :loading="formStore.loading"  @click=""/>
-                                </div> -->
-            </v-card>
+            <v-skeleton-loader class="bg-transparent mx-auto" :class="xs ? 'w-100' : 'w-50'" type="card" :loading="loading">
+              <div class="w-100">
+                <v-card max-width="500" class="mx-auto text-center" elevation="5">
+                  <v-card-text>
+                    <div class="d-flex align-center justify-center ga-2 mb-6 mt-6">
+                      <p class="text-body-1 font-weight-bold">
+                        Phone number {{ phone }} verified
+                      </p>
+                      <v-icon icon="mdi-check-circle" color="success" />
+                    </div>
+                    <div class="d-flex align-center justify-center ga-2 mb-6">
+                      <p class="text-body-1 font-weight-bold">
+                        ID verification pending
+                      </p>
+                      <v-icon icon="mdi-dots-circle" color="warning" />
+                    </div>
+                    <div class="d-flex align-center justify-center ga-2 mb-6">
+                      <p class="text-body-1 font-weight-bold">
+                        GPS verification pending
+                      </p>
+                      <v-icon icon="mdi-dots-circle" color="warning" />
+                    </div>
+                  </v-card-text>
+                  <!-- <div class="pb-5 ">
+                                        <v-btn type="submit" text="Ok" class="bg-newgas"
+                                            :loading="formStore.loading"  @click=""/>
+                                    </div> -->
+                </v-card>
+
+              </div>
+            </v-skeleton-loader>
           </v-container>
         </v-window-item>
 
         <v-window-item :value="2" disabled>
           <v-container :class="smAndDown ? 'mt-16' : 'mt-16'">
-            <v-card max-width="500" class="mx-auto text-center" elevation="5">
-              <v-card-text>
-                <div class="d-flex align-center justify-center ga-2 mb-6 mt-6">
-                  <p class="text-body-1 font-weight-bold">
-                    Phone verification failed
-                  </p>
-                  <v-icon icon="mdi-close-circle" color="error" />
-                </div>
-                <p class="text-body-1 font-weight-bold mb-6">
-                  Click the button to try again
-                </p>
-                <v-btn text="Try again" class="bg-newgas" @click="reload" />
-              </v-card-text>
-            </v-card>
+            <v-skeleton-loader class="bg-transparent mx-auto" :class="xs ? 'w-100' : 'w-50'" type="card" :loading="loading">
+              <div class="w-100">
+                <v-card max-width="500" class="mx-auto text-center" elevation="5">
+                  <v-card-text>
+                    <div class="d-flex align-center justify-center ga-2 mb-6 mt-6">
+                      <p class="text-body-1 font-weight-bold">
+                        Phone verification failed
+                      </p>
+                      <v-icon icon="mdi-close-circle" color="error" />
+                    </div>
+                    <p class="text-body-1 font-weight-bold mb-6">
+                      Click the button to try again
+                    </p>
+                    <v-btn text="Try again" class="bg-newgas mb-3" @click="reload" />
+                  </v-card-text>
+                </v-card>
+              </div>
+            </v-skeleton-loader>
           </v-container>
         </v-window-item>
       </v-window>
