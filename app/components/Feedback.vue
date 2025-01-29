@@ -2,6 +2,7 @@
 import { useUiStore } from '~/stores/ui';
 
 const uiStore = useUiStore()
+const{ smAndDown } = useDisplay()
 </script>
 
 <template>
@@ -10,10 +11,12 @@ const uiStore = useUiStore()
     :color="uiStore.alertStatus ? 'success' : 'error'"
     location="top right"
     multi-line
-    :timeout="10000"
+    :timeout="4000"
+    :class="smAndDown ? 'mt-3' : 'mt-4'"
+    max-width="100%"
   >
     <div class="d-flex ga-1 align-center">
-      <p class="text-body-1 font-weight-medium">{{ uiStore.alertText }}</p>
+      <p class="text-body-1 font-weight-medium overflow-auto">{{ uiStore.alertText }}</p>
     </div>
     <template #actions>
       <v-icon

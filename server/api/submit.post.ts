@@ -42,14 +42,13 @@ export default defineEventHandler(async (event) => {
 
     // Send FormData to external API
     const externalResponse = await axiosInstance.post(
-      'customers/onboard', // Replace with actual endpoint
+      '/customers/onboard', // Replace with actual endpoint
       formData,
     );
     // Return the response data from external API
     return externalResponse.data;
 
   } catch (error: any) {
-    console.log(error.message,';;;;;;;;;')
     throw createError({
       statusCode: 500,
       statusMessage: error.message.includes('ENETUNREACH') ? 'Network Error' : error.message.includes('EHOSTUNREACH') ? 'An unexpected error occurred. Please contact support with Reference ID: B100' : error.message,

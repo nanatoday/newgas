@@ -7,7 +7,7 @@ const axiosInstance = axios.create({ baseURL: runtimeConfig['baseUrl'] })
 export default defineEventHandler(async (event) => {
 
   try {
-   
+   console.log(runtimeConfig['baseUrl'] );
     // Assign headers to new request
     axiosInstance.defaults.headers.post = { ...getHeaders(event) }
 

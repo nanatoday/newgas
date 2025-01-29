@@ -5,34 +5,34 @@ import { useUiStore } from "@/stores/ui";
 import { useDisplay } from "vuetify";
 import Feedback from "./Feedback.vue";
 
-const runtimeConfig = useRuntimeConfig();
-const formStore = useFormStore();
-const uiStore = useUiStore();
-const form = ref<boolean>(false);
-const frontImage = ref<any>();
-const backImage = ref<any>();
-const name = ref<string>("");
-const email = ref<string>("");
-const phone = ref<string>("");
-const address = ref<string>("");
-const agent = ref<string>("");
-const ghanaCard = ref<string>("");
-const idType = ref<string>("");
-const ghCardNotSelected = ref<boolean>(true);
-const route = useRoute();
-const { smAndDown } = useDisplay();
-const agentCode = ref<any>();
-const otp = ref<string>("");
-const showOTP = ref<boolean>(false);
-const showFields = ref<boolean>(false);
-const formWindow = ref<string>("newCustomer");
-const existingCustomer = ref<number>(1);
-const loading = ref<boolean>(false);
-const timeDiff = ref<number>(0);
-const mins = ref<number>();
-const secs = ref<number>();
-const error = ref<boolean>(false);
-const rules = ref({
+const runtimeConfig = useRuntimeConfig()
+const formStore = useFormStore()
+const { xs } = useDisplay()
+const uiStore = useUiStore()
+const form = ref<boolean>(false)
+const frontImage = ref<any>()
+const backImage = ref<any>()
+const name = ref<string>('')
+const email = ref<string>('')
+const phone = ref<string>('')
+const address = ref<string>('')
+const agent = ref<string>('')
+const ghanaCard = ref<string>('')
+const idType = ref<string>('')
+const ghCardNotSelected = ref<boolean>(true)
+const route = useRoute()
+const { smAndDown } = useDisplay()
+const agentCode = ref<any>()
+const otp = ref<string>('')
+const showOTP = ref<boolean>(false)
+const showFields = ref<boolean>(false)
+const formWindow = ref<string>('newCustomer')
+const existingCustomer = ref<number>(1)
+const loading = ref<boolean>(false)
+const timeDiff = ref<number>(0)
+const mins = ref<number>()
+const secs = ref<number>()
+  const rules = ref({
   required: (val: string) => {
     if (val) {
       return true;
@@ -105,35 +105,23 @@ const getOTP = async () => {
   };
 
   try {
-    uiStore.loading = true;
     const data = await $fetch("/api/request-otp", {
       method: "post",
       body: requestData,
       headers: { "API-KEY": runtimeConfig["public"]["apiKey"] },
     });
-    uiStore.alertText = data ?? "";
+    uiStore.alertText = "OTP sent successfully";
     uiStore.alertStatus = true;
     uiStore.alert = true;
     showOTP.value = true;
     timer();
   } catch (error: any) {
-    uiStore.alertText = error?.data?.data ?? error?.data?.message;
+    uiStore.alertText = error?.data?.data?.detail ?? error?.data?.data ?? error?.data?.message;
     uiStore.alertStatus = false;
     uiStore.alert = true;
   } finally {
     loading.value = false;
   }
-
-  // postRequestHandler('customers/request-otp', data)
-  //   .then(res => {
-  //     showOTP.value = true
-  //     timer()
-  //   })
-  //   .catch((error) => {
-  //     uiStore.alert = true
-  //     uiStore.alertText = error
-  //   })
-  //   .finally(() => loading.value = false)
 };
 
 const verifyOTP = async () => {
@@ -149,34 +137,20 @@ const verifyOTP = async () => {
       body: otpData,
       headers: { "API-KEY": runtimeConfig["public"]["apiKey"] },
     });
-    uiStore.alertText = data ?? "";
+    uiStore.alertText = "OTP verified successfully";
     uiStore.alertStatus = true;
     uiStore.alert = true;
     showOTP.value = false;
     showFields.value = true;
   } catch (error: any) {
-    uiStore.alertText = error?.data?.data ?? error?.data?.message;
+    uiStore.alertText = error?.data?.data?.detail ?? error?.data?.message;
     uiStore.alertStatus = false;
     uiStore.alert = true;
   } finally {
     formStore.loading = false;
   }
-
-  // postRequestHandler('customers/verify-otp', data)
-  //   .then(res => {
-  //     showOTP.value = false
-  //     showFields.value = true
-  //   })
-  //   .catch((error) => {
-  //     uiStore.alert = true
-  //     uiStore.alertText = error
-  //   })
-  //   .finally(() => formStore.loading = false)
 };
 
-const reload = () => {
-  window.location.reload();
-};
 
 const submitForm = async () => {
   const formData = new FormData();
@@ -192,10 +166,11 @@ const submitForm = async () => {
   formData.append("id_card_number", ghanaCard.value);
   formData.append("digital_address", address.value);
   formData.append("email", email.value);
+  formData.append("otp", otp.value);
 
-  // if (agent.value) {
-  //   localStorage.setItem('agent_code', agent.value)
-  // }
+  if (agent.value) {
+    localStorage.setItem('agent_code', agent.value)
+  }
 
   try {
     uiStore.loading = true;
@@ -206,7 +181,7 @@ const submitForm = async () => {
     });
     formStore.notify = true;
   } catch (error: any) {
-    uiStore.alertText = error?.data?.data ?? error?.data?.message;
+    uiStore.alertText = error?.data?.data?.detail ?? error?.data?.data ?? error?.data?.message;
     uiStore.alertStatus = false;
     uiStore.alert = true;
   } finally {
@@ -225,17 +200,27 @@ const formCheck = () => {
   }
 };
 
-watch(
-  () => agent.value,
-  () => {
-    localStorage.setItem("agent_code", agent.value);
-  }
-);
+const reload = () => {
+  window.location.reload();
+};
+// watch(() => agent.value, () => {
+//   if (agent.value) {
+//     localStorage.setItem("agent_code", agent.value);
+//   }
+// }
+// );
+
+const clearAgentCode = () => {
+  localStorage.removeItem("agent_code")
+  agent.value = ''
+  agentCode.value = undefined
+}
 
 onMounted(async () => {
   if (route.query?.agent == "true" || route.query?.agent == "1") {
     if (localStorage.getItem("agent_code")) {
-      agent.value = localStorage.getItem("agent_code") as string;
+      agent.value = localStorage.getItem("agent_code") as string
+      agentCode.value = agent.value
     }
   }
 
@@ -248,42 +233,24 @@ onMounted(async () => {
         method: "get",
         headers: { "API-KEY": runtimeConfig["public"]["apiKey"] },
       });
-      uiStore.alertText = data ?? "";
-      uiStore.alertStatus = true;
-      uiStore.alert = true;
-      showOTP.value = true;
-      formWindow.value = "existingCustomer";
-      timer();
+      existingCustomer.value = 1
     } catch (error: any) {
-      uiStore.alertText = error?.data?.data ?? error?.data?.message;
+      existingCustomer.value = 2
+      uiStore.alertText = error?.data?.data?.detail ?? error?.data?.data ?? error?.data?.message;
       uiStore.alertStatus = false;
       uiStore.alert = true;
     } finally {
+      formWindow.value = "existingCustomer";
       loading.value = false;
     }
-
-    // postRequestHandler('customers/request-otp', data)
-    //   .then(res => {
-    //     showOTP.value = true
-    //     timer()
-    //   })
-    //   .catch((error) => {
-    //     uiStore.alert = true
-    //     uiStore.alertText = error
-    //   })
-    //   .finally(() => loading.value = false)
   }
-  // error.value = true
-  // if (error.value) {
-  //   existingCustomer.value = 2
-  // }
 });
 </script>
 
 <template>
   <v-window v-model="formWindow">
-    <v-window-item value="newCustomer" v-if="!route.query?.phone">
-      <v-container :class="smAndDown ? 'mt-13' : 'mt-16'">
+    <v-window-item value="newCustomer" v-if="!route.query?.token">
+      <v-container  style="margin-top: 72px;">
         <v-card max-width="700" class="mx-auto" elevation="2">
           <v-toolbar
             title="Customer Registration"
@@ -291,23 +258,18 @@ onMounted(async () => {
           />
           <v-form @submit.prevent="submitForm" v-model="form">
             <v-card-text>
-              <p class="text-error text-body-1 font-weight-bold text-center">
-                {{ formStore.error }}
-              </p>
-              <div
-                v-if="route.query?.agent == 'true' || route.query?.agent == '1'"
-              >
-                <p class="text-body-1 mb-1">
-                  Agent Code <span class="text-error">*</span>
-                </p>
-                <v-text-field
-                  variant="outlined"
-                  density="comfortable"
-                  v-model="agent"
-                  :rules="[rules.required]"
-                  placeholder="Eg. xxxx"
-                  :disabled="agentCode !== undefined"
-                />
+              <p class="text-error text-body-1 font-weight-bold text-center">{{ formStore.error }}</p>
+              <div v-if="route.query?.agent == 'true' || route.query?.agent == '1'">
+                <p class="text-body-1 mb-1">Agent Code*</p>
+                <div class="d-flex ga-2">
+                  <v-text-field variant="outlined" density="comfortable" v-model="agent"
+                    :rules="[rules.required]" placeholder="Eg. xxxx" :readonly="agentCode !== undefined" />
+                    <v-tooltip text="Clear Agent code" v-if="agentCode">
+                      <template v-slot:activator="{ props }">
+                        <v-btn text="Clear" color="newgas" v-bind="props" style="margin-top: 6px;" @click="clearAgentCode"/>
+                      </template>
+                    </v-tooltip>
+                </div>
               </div>
               <div>
                 <p class="text-body-1 mb-1">
@@ -368,14 +330,16 @@ onMounted(async () => {
                   <p class="text-body-1 mb-1">
                     Please enter OTP code sent to {{ phone }}
                   </p>
-                  <div class="d-flex align-center ga-5">
+                  <div class="d-flex align-center" :class="xs ? 'ga-0' : 'ga-5'">
                     <v-otp-input v-model="otp" />
+                    <v-btn icon="mdi-send-variant" variant="text" color="newgas" v-if="xs"/>
                     <v-btn
                       text="Submit"
                       color="newgas"
                       @click="verifyOTP"
                       :loading="formStore.loading"
                       :disabled="otp.length !== 6"
+                      v-else
                     />
                   </div>
                   <div class="d-flex align-center ga-2">
@@ -497,7 +461,7 @@ onMounted(async () => {
                 text="Submit"
                 class="bg-newgas"
                 size="large"
-                :loading="formStore.loading"
+                :loading="uiStore.loading"
                 :disabled="
                   !(form && frontImage && (backImage || ghCardNotSelected))
                 "
@@ -509,7 +473,7 @@ onMounted(async () => {
       </v-container>
     </v-window-item>
 
-    <v-window-item value="existingCustomer" v-if="route.query?.phone" disabled>
+    <v-window-item value="existingCustomer" v-if="route.query?.token" disabled>
       <v-window v-model="existingCustomer">
         <v-window-item :value="1">
           <v-container :class="smAndDown ? 'mt-16' : 'mt-16'">
