@@ -5,7 +5,7 @@ const { xs,smAndDown } = useDisplay()
 </script>
 
 <template>
-    <v-app-bar class=" bg-newgas" :class="xs ? 'px-2' : 'px-8', xs? 'pa-0' : 'pa-1'">
+    <v-app-bar class=" bg-newgas elevation-0" :class="xs ? 'px-2' : 'px-8', xs? 'pa-0' : 'pa-1'">
         <template v-slot:prepend>
             <a href="https://newgas.online" class="d-flex align-center text-decoration-none text-white">
                 <v-img src="~/assets/NewgasFinalLogo.png" alt="Newgas Logo" :width="smAndDown ? '40' : '50'"/>
