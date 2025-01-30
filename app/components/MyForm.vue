@@ -29,6 +29,7 @@ const showFields = ref<boolean>(false)
 const formWindow = ref<string>('newCustomer')
 const existingCustomer = ref<number>(1)
 const loading = ref<boolean>(false)
+const skeletonLoader = ref<boolean>(false)
 const timeDiff = ref<number>(0)
 const mins = ref<number>()
 const secs = ref<number>()
@@ -39,6 +40,26 @@ const secs = ref<number>()
     }
     return "Field is required";
   },
+  ghcard: (val: string) => {
+    // must be a valid ghana card
+    if (/^GHA-[0-9]{9}-[0-9]$/i.test(val)) {
+      return true;
+    }
+    return "Must be a valid Ghana card number";
+  },
+  passport: (val: string) => {
+    // must be a valid passport
+    if (/^[A-Z]{1}[0-9]{7}$/i.test(val)) {
+      return true;
+    }
+    return "Must be a valid passport number";
+  },
+  // gps: (val: string) => {
+  //   if (val.length === 12) {
+  //     return true;
+  //   }
+  //   return "Must be a valid GPS address";
+  // },
   email: (val: string) => {
     // must be a valid email
     if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/i.test(val)) {
@@ -225,7 +246,7 @@ onMounted(async () => {
   }
 
   if (route.query?.token) {
-    loading.value = true;
+    skeletonLoader.value = true;
 
     try {
       const data = await $fetch(`/api/verify-token/${route.query?.token}`, {
@@ -240,7 +261,7 @@ onMounted(async () => {
       uiStore.alert = true;
     } finally {
       formWindow.value = "existingCustomer";
-      loading.value = false;
+      skeletonLoader.value = false;
     }
   }
 });
@@ -272,7 +293,7 @@ onMounted(async () => {
               </div>
               <div>
                 <p class="text-body-1 mb-1">
-                  Name <span class="text-error">*</span>
+                  Full Name <span class="text-error">*</span>
                 </p>
                 <v-text-field
                   variant="outlined"
@@ -331,7 +352,7 @@ onMounted(async () => {
                   </p>
                   <div class="d-flex align-center" :class="xs ? 'ga-0' : 'ga-5'">
                     <v-otp-input v-model="otp" />
-                    <v-btn icon="mdi-send-variant" variant="text" color="newgas" @click="verifyOTP" v-if="xs" :loading="formStore.loading"/>
+                    <v-btn icon="mdi-send-variant" variant="text" color="newgas" @click="verifyOTP" v-if="xs" :loading="formStore.loading" :disabled="otp.length !== 6"/>
                     <v-btn
                       text="Submit"
                       color="newgas"
@@ -401,8 +422,8 @@ onMounted(async () => {
                     variant="outlined"
                     density="comfortable"
                     v-model="ghanaCard"
-                    :rules="[rules.required]"
-                    placeholder="Eg. GHA-xxxxxxxxx-x"
+                    :rules="[rules.ghcard]"
+                    placeholder="Eg. GHA-XXXXXXXXX-X"
                   />
                 </div>
 
@@ -427,8 +448,8 @@ onMounted(async () => {
                     variant="outlined"
                     density="comfortable"
                     v-model="ghanaCard"
-                    :rules="[rules.required]"
-                    placeholder="Eg. xxxxxxxxx"
+                    :rules="[rules.passport]"
+                    placeholder="Eg. GXXXXXXX"
                   />
                 </div>
                 <p class="text-body-1 mb-1">
@@ -472,68 +493,72 @@ onMounted(async () => {
       </v-container>
     </v-window-item>
 
-    <v-window-item value="existingCustomer" v-if="route.query?.token" disabled>
-      <v-window v-model="existingCustomer">
-        <v-window-item :value="1">
-          <v-container :class="smAndDown ? 'mt-16' : 'mt-16'">
-            <v-skeleton-loader class="bg-transparent mx-auto" :class="xs ? 'w-100' : 'w-50'" type="card" :loading="loading">
-              <div class="w-100">
-                <v-card max-width="500" class="mx-auto text-center" elevation="5">
-                  <v-card-text>
-                    <div class="d-flex align-center justify-center ga-2 mb-6 mt-6">
-                      <p class="text-body-1 font-weight-bold">
-                        Phone number {{ phone }} verified
-                      </p>
-                      <v-icon icon="mdi-check-circle" color="success" />
-                    </div>
-                    <div class="d-flex align-center justify-center ga-2 mb-6">
-                      <p class="text-body-1 font-weight-bold">
-                        ID verification pending
-                      </p>
-                      <v-icon icon="mdi-dots-circle" color="warning" />
-                    </div>
-                    <div class="d-flex align-center justify-center ga-2 mb-6">
-                      <p class="text-body-1 font-weight-bold">
-                        GPS verification pending
-                      </p>
-                      <v-icon icon="mdi-dots-circle" color="warning" />
-                    </div>
-                  </v-card-text>
-                  <!-- <div class="pb-5 ">
-                                        <v-btn type="submit" text="Ok" class="bg-newgas"
-                                            :loading="formStore.loading"  @click=""/>
-                                    </div> -->
-                </v-card>
-
-              </div>
-            </v-skeleton-loader>
-          </v-container>
-        </v-window-item>
-
-        <v-window-item :value="2" disabled>
-          <v-container :class="smAndDown ? 'mt-16' : 'mt-16'">
-            <v-skeleton-loader class="bg-transparent mx-auto" :class="xs ? 'w-100' : 'w-50'" type="card" :loading="loading">
-              <div class="w-100">
-                <v-card max-width="500" class="mx-auto text-center" elevation="5">
-                  <v-card-text>
-                    <div class="d-flex align-center justify-center ga-2 mb-6 mt-6">
-                      <p class="text-body-1 font-weight-bold">
-                        Phone verification failed
-                      </p>
-                      <v-icon icon="mdi-close-circle" color="error" />
-                    </div>
+    <v-skeleton-loader class="bg-transparent mx-auto mt-16" :class="xs ? 'w-100' : 'w-50', xs ? 'px-2' : 'px-0'" type="card" :loading="skeletonLoader">
+      <v-window-item value="existingCustomer" v-if="route.query?.token" disabled class="w-100">
+        <v-window v-model="existingCustomer">
+          <v-window-item :value="1">
+            <v-container>
+              <v-card max-width="500" class="mx-auto text-center" elevation="5">
+                <v-card-text>
+                  <div class="d-flex align-center justify-center ga-2 mb-6 mt-6">
+                    <p class="text-body-1 font-weight-bold">
+                      Phone number {{ phone }} verified
+                    </p>
+                    <v-icon icon="mdi-check-circle" color="success" />
+                  </div>
+                  <div class="d-flex align-center justify-center ga-2 mb-6">
+                    <p class="text-body-1 font-weight-bold">
+                      ID verification pending
+                    </p>
+                    <v-icon icon="mdi-dots-circle" color="warning" />
+                  </div>
+                  <div class="d-flex align-center justify-center ga-2 mb-6">
+                    <p class="text-body-1 font-weight-bold">
+                      GPS verification pending
+                    </p>
+                    <v-icon icon="mdi-dots-circle" color="warning" />
+                  </div>
+                </v-card-text>
+                <!-- <div class="pb-5 ">
+                                      <v-btn type="submit" text="Ok" class="bg-newgas"
+                                          :loading="formStore.loading"  @click=""/>
+                                  </div> -->
+              </v-card>
+            </v-container>
+          </v-window-item>
+  
+          <v-window-item :value="2" disabled>
+            <v-container>
+              <v-card max-width="500" class="mx-auto text-center" elevation="5">
+                <v-card-text>
+                  <p class="text-body-1 font-weight-bold mt-6 mb-6">
+                    {{ uiStore.alertText }}
+                  </p>
+                  <div v-if="!uiStore.alertText.includes('registered')">
                     <p class="text-body-1 font-weight-bold mb-6">
                       Click the button to try again
                     </p>
                     <v-btn text="Try again" class="bg-newgas mb-3" @click="reload" />
-                  </v-card-text>
-                </v-card>
-              </div>
-            </v-skeleton-loader>
-          </v-container>
-        </v-window-item>
-      </v-window>
-    </v-window-item>
+                  </div>
+                  <div class="d-flex align-center justify-center ga-2 mb-6"  v-if="uiStore.alertText.includes('registered')">
+                    <p class="text-body-1 font-weight-bold">
+                      ID verification pending
+                    </p>
+                    <v-icon icon="mdi-dots-circle" color="warning" />
+                  </div>
+                  <div class="d-flex align-center justify-center ga-2 mb-6"  v-if="uiStore.alertText.includes('registered')">
+                    <p class="text-body-1 font-weight-bold">
+                      GPS verification pending
+                    </p>
+                    <v-icon icon="mdi-dots-circle" color="warning" />
+                  </div>
+                </v-card-text>
+              </v-card>
+            </v-container>
+          </v-window-item>
+        </v-window>
+      </v-window-item>
+    </v-skeleton-loader>
   </v-window>
   <Feedback />
   <SucessNotice />

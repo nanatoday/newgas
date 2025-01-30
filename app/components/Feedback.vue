@@ -11,7 +11,7 @@ const{ smAndDown } = useDisplay()
     :color="uiStore.alertStatus ? 'success' : 'error'"
     location="top right"
     multi-line
-    :timeout="4000"
+    :timeout="4500"
     :class="smAndDown ? 'mt-3' : 'mt-4'"
     max-width="100%"
   >
