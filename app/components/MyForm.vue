@@ -26,10 +26,7 @@ const agentCode = ref<any>()
 const otp = ref<string>('')
 const showOTP = ref<boolean>(false)
 const showFields = ref<boolean>(false)
-const formWindow = ref<string>('newCustomer')
-const existingCustomer = ref<number>(1)
 const loading = ref<boolean>(false)
-const skeletonLoader = ref<boolean>(false)
 const timeDiff = ref<number>(0)
 const mins = ref<number>()
 const secs = ref<number>()
@@ -42,14 +39,14 @@ const secs = ref<number>()
   },
   ghcard: (val: string) => {
     // must be a valid ghana card
-    if (/^GHA-[0-9]{9}-[0-9]$/i.test(val)) {
+    if (/^[A-Z]{3}-[0-9]{9}-[0-9]$/i.test(val)) {
       return true;
     }
     return "Must be a valid Ghana card number";
   },
   passport: (val: string) => {
     // must be a valid passport
-    if (/^[A-Z]{1}[0-9]{7}$/i.test(val)) {
+    if (/^[A-Z][0-9]{7}$/i.test(val)) {
       return true;
     }
     return "Must be a valid passport number";
@@ -221,9 +218,6 @@ const formCheck = () => {
   }
 };
 
-const reload = () => {
-  window.location.reload();
-};
 // watch(() => agent.value, () => {
 //   if (agent.value) {
 //     localStorage.setItem("agent_code", agent.value);
@@ -245,321 +239,232 @@ onMounted(async () => {
     }
   }
 
-  if (route.query?.token) {
-    skeletonLoader.value = true;
-
-    try {
-      const data = await $fetch(`/api/verify-token/${route.query?.token}`, {
-        method: "get",
-        headers: { "API-KEY": runtimeConfig["public"]["apiKey"] },
-      });
-      existingCustomer.value = 1
-    } catch (error: any) {
-      existingCustomer.value = 2
-      uiStore.alertText = error?.data?.data?.detail ?? error?.data?.data ?? error?.data?.message;
-      uiStore.alertStatus = false;
-      uiStore.alert = true;
-    } finally {
-      formWindow.value = "existingCustomer";
-      skeletonLoader.value = false;
-    }
-  }
+ 
 });
 </script>
 
 <template>
-  <v-window v-model="formWindow">
-    <v-window-item value="newCustomer" v-if="!route.query?.token">
-      <v-container  style="margin-top: 72px;">
-        <v-card max-width="700" class="mx-auto" elevation="2">
-          <v-toolbar
-            title="Customer Registration"
-            class="bg-newgas text-white"
-          />
-          <v-form @submit.prevent="submitForm" v-model="form">
-            <v-card-text>
-              <p class="text-error text-body-1 font-weight-bold text-center">{{ formStore.error }}</p>
-              <div v-if="route.query?.agent == 'true' || route.query?.agent == '1'">
-                <p class="text-body-1 mb-1">Agent Code*</p>
-                <div class="d-flex ga-2">
-                  <v-text-field variant="outlined" density="comfortable" v-model="agent"
-                    :rules="[rules.required]" placeholder="Eg. xxxx" :readonly="agentCode !== undefined" />
-                    <v-tooltip text="Clear Agent code" v-if="agentCode">
-                      <template v-slot:activator="{ props }">
-                        <v-btn text="Clear" color="newgas" v-bind="props" style="margin-top: 6px;" @click="clearAgentCode"/>
-                      </template>
-                    </v-tooltip>
-                </div>
-              </div>
-              <div>
-                <p class="text-body-1 mb-1">
-                  Full Name <span class="text-error">*</span>
-                </p>
-                <v-text-field
-                  variant="outlined"
-                  density="comfortable"
-                  v-model="name"
-                  :rules="[rules.required]"
-                  placeholder="Eg. Kwadwo Mensah"
-                />
-              </div>
-              <div>
-                <p class="text-body-1 mb-1">Email</p>
-                <v-text-field
-                  variant="outlined"
-                  density="comfortable"
-                  v-model="email"
-                  placeholder="Eg. kwadwomensah@example.com"
-                />
-              </div>
-              <div>
-                <p class="text-body-1 mb-1">
-                  Phone Number <span class="text-error">*</span>
-                </p>
-                <div class="d-flex ga-2">
-                  <v-text-field
-                    variant="outlined"
-                    density="comfortable"
-                    v-model="phone"
-                    type="number"
-                    :rules="[rules.phoneNumber]"
-                    placeholder="Eg. 024xxxxxxx"
-                  />
-
-                  <v-btn
-                    v-if="!showFields"
-                    text="Verify"
-                    color="newgas"
-                    :loading="loading"
-                    :disabled="phone.length !== 10 || timeDiff > 0"
-                    @click="getOTP"
-                    style="margin-top: 6px"
-                  />
-                  <v-tooltip text="Verified" v-else>
-                    <template v-slot:activator="{ props }">
-                      <v-btn
-                        v-bind="props"
-                        icon="mdi-check-circle"
-                        variant="text"
-                        color="success"
-                      />
-                    </template>
-                  </v-tooltip>
-                </div>
-                <div v-if="showOTP">
-                  <p class="text-body-1 mb-1">
-                    Please enter OTP code sent to {{ phone }}
-                  </p>
-                  <div class="d-flex align-center" :class="xs ? 'ga-0' : 'ga-5'">
-                    <v-otp-input v-model="otp" />
-                    <v-btn icon="mdi-send-variant" variant="text" color="newgas" @click="verifyOTP" v-if="xs" :loading="formStore.loading" :disabled="otp.length !== 6"/>
-                    <v-btn
-                      text="Submit"
-                      color="newgas"
-                      @click="verifyOTP"
-                      :loading="formStore.loading"
-                      :disabled="otp.length !== 6"
-                      v-else
-                    />
-                  </div>
-                  <div class="d-flex align-center ga-2">
-                    <div>
-                      <p v-if="timeDiff > 0" class="text-body-2">
-                        Resend in {{ mins }}:{{ secs }}
-                      </p>
-                      <p v-if="timeDiff < 0" class="text-body-2">Resend</p>
-                    </div>
-                    <!-- <v-btn text="Resend" class="bg-newgas" @click="getOTP" :loading="loading" :disabled=""/> -->
-                    <v-tooltip text="Resend code">
-                      <template v-slot:activator="{ props }">
-                        <v-btn
-                          icon="mdi-reload"
-                          @click="getOTP"
-                          v-bind="props"
-                          variant="text"
-                          color="newgas"
-                          :disabled="timeDiff > 0"
-                        />
-                      </template>
-                    </v-tooltip>
-                  </div>
-                </div>
-              </div>
-              <div v-if="showFields">
-                <p class="text-body-1 mb-1">Digital Address</p>
-                <v-text-field
-                  variant="outlined"
-                  density="comfortable"
-                  v-model="address"
-                  placeholder="Eg. BS-xxxx-xxxx"
-                />
-              </div>
-              <div v-if="showFields">
-                <p class="text-body-1 mb-1">
-                  ID Type <span class="text-error">*</span>
-                </p>
-                <v-select
-                  variant="outlined"
-                  density="comfortable"
-                  v-model="idType"
-                  placeholder="Eg. Passport"
-                  :items="[
-                    { title: 'Ghana Card', value: 'gh_card' },
-                    { title: 'Passport', value: 'passport' },
-                  ]"
-                  item-title="title"
-                  item-value="value"
-                  :rules="[rules.required]"
-                  @update:model-value="formCheck"
-                />
-              </div>
-              <div v-if="idType == 'gh_card'">
-                <div>
-                  <p class="text-body-1 mb-1">
-                    Ghana Card ID <span class="text-error">*</span>
-                  </p>
-                  <v-text-field
-                    variant="outlined"
-                    density="comfortable"
-                    v-model="ghanaCard"
-                    :rules="[rules.ghcard]"
-                    placeholder="Eg. GHA-XXXXXXXXX-X"
-                  />
-                </div>
-
-                <p class="text-body-1 mb-1">
-                  Upload Ghana Card <span class="text-error">*</span>
-                </p>
-                <v-row>
-                  <v-col cols="12" md="6" sm="6">
-                    <PictureUpload v-model="frontImage" side="front" />
-                  </v-col>
-                  <v-col cols="12" md="6" sm="6">
-                    <PictureUpload v-model="backImage" side="back" />
-                  </v-col>
-                </v-row>
-              </div>
-              <div v-if="idType == 'passport'">
-                <div>
-                  <p class="text-body-1 mb-1">
-                    Passport ID <span class="text-error">*</span>
-                  </p>
-                  <v-text-field
-                    variant="outlined"
-                    density="comfortable"
-                    v-model="ghanaCard"
-                    :rules="[rules.passport]"
-                    placeholder="Eg. GXXXXXXX"
-                  />
-                </div>
-                <p class="text-body-1 mb-1">
-                  Upload Passport Bio Page <span class="text-error">*</span>
-                </p>
-                <div class="w-100">
-                  <PictureUpload
-                    v-model="frontImage"
-                    side="Bio Page"
-                    class="w-100"
-                  />
-                </div>
-              </div>
-              <!-- <div v-if="idType == 'driver_license'">
-                                <div>
-                                    <p class="text-body-1 mb-1">Driver's License ID*</p>
-                                    <v-text-field variant="outlined" density="comfortable" v-model="ghanaCard"
-                                        :rules="[formStore.rules.required]" placeholder="Eg. xxxxxxxxx" />
-                                </div>
-                                <p class="text-body-1 mb-1">Upload Driver's License*</p>
-                                <div class="text-center">
-                                    <PictureUpload v-model="frontImage" side="front" />
-                                </div>
-                            </div> -->
-            </v-card-text>
-            <v-card-actions v-if="showFields" class="px-5 pb-5">
-              <v-btn
-                type="submit"
-                text="Submit"
-                class="bg-newgas"
-                size="large"
-                :loading="uiStore.loading"
-                :disabled="
-                  !(form && frontImage && (backImage || ghCardNotSelected))
-                "
-                block
+  <v-container  style="margin-top: 72px;">
+    <v-card max-width="700" class="mx-auto" elevation="2">
+      <v-toolbar
+        title="Customer Registration"
+        class="bg-newgas text-white"
+      />
+      <v-form @submit.prevent="submitForm" v-model="form">
+        <v-card-text>
+          <p class="text-error text-body-1 font-weight-bold text-center">{{ formStore.error }}</p>
+          <div v-if="route.query?.agent == 'true' || route.query?.agent == '1'">
+            <p class="text-body-1 mb-1">Agent Code*</p>
+            <div class="d-flex ga-2">
+              <v-text-field variant="outlined" density="comfortable" v-model="agent"
+                :rules="[rules.required]" placeholder="Eg. xxxx" :readonly="agentCode !== undefined" />
+                <v-tooltip text="Clear Agent code" v-if="agentCode">
+                  <template v-slot:activator="{ props }">
+                    <v-btn text="Clear" color="newgas" v-bind="props" style="margin-top: 6px;" @click="clearAgentCode"/>
+                  </template>
+                </v-tooltip>
+            </div>
+          </div>
+          <div>
+            <p class="text-body-1 mb-1">
+              Full Name <span class="text-error">*</span>
+            </p>
+            <v-text-field
+              variant="outlined"
+              density="comfortable"
+              v-model="name"
+              :rules="[rules.required]"
+              placeholder="Eg. Kwadwo Mensah"
+            />
+          </div>
+          <div>
+            <p class="text-body-1 mb-1">Email</p>
+            <v-text-field
+              variant="outlined"
+              density="comfortable"
+              v-model="email"
+              placeholder="Eg. kwadwomensah@example.com"
+            />
+          </div>
+          <div>
+            <p class="text-body-1 mb-1">
+              Phone Number <span class="text-error">*</span>
+            </p>
+            <div class="d-flex ga-2">
+              <v-text-field
+                variant="outlined"
+                density="comfortable"
+                v-model="phone"
+                type="number"
+                :rules="[rules.phoneNumber]"
+                placeholder="Eg. 024xxxxxxx"
               />
-            </v-card-actions>
-          </v-form>
-        </v-card>
-      </v-container>
-    </v-window-item>
 
-    <v-skeleton-loader class="bg-transparent mx-auto mt-16" :class="xs ? 'w-100' : 'w-50', xs ? 'px-2' : 'px-0'" type="card" :loading="skeletonLoader">
-      <v-window-item value="existingCustomer" v-if="route.query?.token" disabled class="w-100">
-        <v-window v-model="existingCustomer">
-          <v-window-item :value="1">
-            <v-container>
-              <v-card max-width="500" class="mx-auto text-center" elevation="5">
-                <v-card-text>
-                  <div class="d-flex align-center justify-center ga-2 mb-6 mt-6">
-                    <p class="text-body-1 font-weight-bold">
-                      Phone number {{ phone }} verified
-                    </p>
-                    <v-icon icon="mdi-check-circle" color="success" />
-                  </div>
-                  <div class="d-flex align-center justify-center ga-2 mb-6">
-                    <p class="text-body-1 font-weight-bold">
-                      ID verification pending
-                    </p>
-                    <v-icon icon="mdi-dots-circle" color="warning" />
-                  </div>
-                  <div class="d-flex align-center justify-center ga-2 mb-6">
-                    <p class="text-body-1 font-weight-bold">
-                      GPS verification pending
-                    </p>
-                    <v-icon icon="mdi-dots-circle" color="warning" />
-                  </div>
-                </v-card-text>
-                <!-- <div class="pb-5 ">
-                                      <v-btn type="submit" text="Ok" class="bg-newgas"
-                                          :loading="formStore.loading"  @click=""/>
-                                  </div> -->
-              </v-card>
-            </v-container>
-          </v-window-item>
-  
-          <v-window-item :value="2" disabled>
-            <v-container>
-              <v-card max-width="500" class="mx-auto text-center" elevation="5">
-                <v-card-text>
-                  <p class="text-body-1 font-weight-bold mt-6 mb-6">
-                    {{ uiStore.alertText }}
+              <v-btn
+                v-if="!showFields"
+                text="Verify"
+                color="newgas"
+                :loading="loading"
+                :disabled="phone.length !== 10 || timeDiff > 0"
+                @click="getOTP"
+                style="margin-top: 6px"
+              />
+              <v-tooltip text="Verified" v-else>
+                <template v-slot:activator="{ props }">
+                  <v-btn
+                    v-bind="props"
+                    icon="mdi-check-circle"
+                    variant="text"
+                    color="success"
+                  />
+                </template>
+              </v-tooltip>
+            </div>
+            <div v-if="showOTP">
+              <p class="text-body-1 mb-1">
+                Please enter OTP code sent to {{ phone }}
+              </p>
+              <div class="d-flex align-center" :class="xs ? 'ga-0' : 'ga-5'">
+                <v-otp-input v-model="otp" />
+                <v-btn icon="mdi-send-variant" variant="text" color="newgas" @click="verifyOTP" v-if="xs" :loading="formStore.loading" :disabled="otp.length !== 6"/>
+                <v-btn
+                  text="Submit"
+                  color="newgas"
+                  @click="verifyOTP"
+                  :loading="formStore.loading"
+                  :disabled="otp.length !== 6"
+                  v-else
+                />
+              </div>
+              <div class="d-flex align-center ga-2">
+                <div>
+                  <p v-if="timeDiff > 0" class="text-body-2">
+                    Haven’t received yet? Resend in {{ mins }}:{{ secs }}
                   </p>
-                  <div v-if="!uiStore.alertText.includes('registered')">
-                    <p class="text-body-1 font-weight-bold mb-6">
-                      Click the button to try again
-                    </p>
-                    <v-btn text="Try again" class="bg-newgas mb-3" @click="reload" />
-                  </div>
-                  <div class="d-flex align-center justify-center ga-2 mb-6"  v-if="uiStore.alertText.includes('registered')">
-                    <p class="text-body-1 font-weight-bold">
-                      ID verification pending
-                    </p>
-                    <v-icon icon="mdi-dots-circle" color="warning" />
-                  </div>
-                  <div class="d-flex align-center justify-center ga-2 mb-6"  v-if="uiStore.alertText.includes('registered')">
-                    <p class="text-body-1 font-weight-bold">
-                      GPS verification pending
-                    </p>
-                    <v-icon icon="mdi-dots-circle" color="warning" />
-                  </div>
-                </v-card-text>
-              </v-card>
-            </v-container>
-          </v-window-item>
-        </v-window>
-      </v-window-item>
-    </v-skeleton-loader>
-  </v-window>
+                  <p v-if="timeDiff < 0" class="text-body-2">Resend</p>
+                </div>
+                <!-- <v-btn text="Resend" class="bg-newgas" @click="getOTP" :loading="loading" :disabled=""/> -->
+                <v-tooltip text="Resend code">
+                  <template v-slot:activator="{ props }">
+                    <v-btn
+                      icon="mdi-reload"
+                      @click="getOTP"
+                      v-bind="props"
+                      variant="text"
+                      color="newgas"
+                      :disabled="timeDiff > 0"
+                    />
+                  </template>
+                </v-tooltip>
+              </div>
+            </div>
+          </div>
+          <div v-if="showFields">
+            <p class="text-body-1 mb-1">Digital Address</p>
+            <v-text-field
+              variant="outlined"
+              density="comfortable"
+              v-model="address"
+              placeholder="Eg. BS-xxxx-xxxx"
+            />
+          </div>
+          <div v-if="showFields">
+            <p class="text-body-1 mb-1">
+              ID Type <span class="text-error">*</span>
+            </p>
+            <v-select
+              variant="outlined"
+              density="comfortable"
+              v-model="idType"
+              placeholder="Eg. Passport"
+              :items="[
+                { title: 'Ghana Card', value: 'gh_card' },
+                { title: 'Passport', value: 'passport' },
+              ]"
+              item-title="title"
+              item-value="value"
+              :rules="[rules.required]"
+              @update:model-value="formCheck"
+            />
+          </div>
+          <div v-if="idType == 'gh_card'">
+            <div>
+              <p class="text-body-1 mb-1">
+                Ghana Card ID <span class="text-error">*</span>
+              </p>
+              <v-text-field
+                variant="outlined"
+                density="comfortable"
+                v-model="ghanaCard"
+                :rules="[rules.ghcard]"
+                placeholder="Eg. GHA-XXXXXXXXX-X"
+              />
+            </div>
+
+            <p class="text-body-1 mb-1">
+              Upload Ghana Card <span class="text-error">*</span>
+            </p>
+            <v-row>
+              <v-col cols="12" md="6" sm="6">
+                <PictureUpload v-model="frontImage" side="front" />
+              </v-col>
+              <v-col cols="12" md="6" sm="6">
+                <PictureUpload v-model="backImage" side="back" />
+              </v-col>
+            </v-row>
+          </div>
+          <div v-if="idType == 'passport'">
+            <div>
+              <p class="text-body-1 mb-1">
+                Passport ID <span class="text-error">*</span>
+              </p>
+              <v-text-field
+                variant="outlined"
+                density="comfortable"
+                v-model="ghanaCard"
+                :rules="[rules.passport]"
+                placeholder="Eg. GXXXXXXX"
+              />
+            </div>
+            <p class="text-body-1 mb-1">
+              Upload Passport Bio Page <span class="text-error">*</span>
+            </p>
+            <div class="w-100">
+              <PictureUpload
+                v-model="frontImage"
+                side="Bio Page"
+                class="w-100"
+              />
+            </div>
+          </div>
+          <!-- <div v-if="idType == 'driver_license'">
+                            <div>
+                                <p class="text-body-1 mb-1">Driver's License ID*</p>
+                                <v-text-field variant="outlined" density="comfortable" v-model="ghanaCard"
+                                    :rules="[formStore.rules.required]" placeholder="Eg. xxxxxxxxx" />
+                            </div>
+                            <p class="text-body-1 mb-1">Upload Driver's License*</p>
+                            <div class="text-center">
+                                <PictureUpload v-model="frontImage" side="front" />
+                            </div>
+                        </div> -->
+        </v-card-text>
+        <v-card-actions v-if="showFields" class="px-5 pb-5">
+          <v-btn
+            type="submit"
+            text="Submit"
+            class="bg-newgas"
+            size="large"
+            :loading="uiStore.loading"
+            :disabled="
+              !(form && frontImage && (backImage || ghCardNotSelected))
+            "
+            block
+          />
+        </v-card-actions>
+      </v-form>
+    </v-card>
+  </v-container>
   <Feedback />
   <SucessNotice />
 </template>
