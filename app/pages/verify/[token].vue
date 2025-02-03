@@ -66,6 +66,9 @@ onMounted(async () => {
                                 <p class="text-body-1 font-weight-bold mt-6 mb-6">
                                     {{ uiStore.alertText }}
                                 </p>
+                                <p class="text-body-1 font-weight-bold mb-6" v-if="uiStore.alertText.includes('registered')">
+                                    You can click <a href="https://newgas.online" style="color: #A5101B;" class="text-decoration-none">here</a> to visit our website
+                                </p>
                                 <div v-if="!uiStore.alertText.includes('registered')">
                                     <p class="text-body-1 font-weight-bold mb-6">
                                         Click the button to try again
