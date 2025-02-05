@@ -88,7 +88,7 @@ const secs = ref<number>()
 
 const timer = () => {
   // Set the date we're counting down to
-  let y = 1 * 60 * 1000;
+  let y = 3 * 60 * 1000;
   let tokenExp = new Date().getTime();
 
   // Update the count down every 1 second
