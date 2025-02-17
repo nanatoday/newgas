@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
 
   } catch (error: any) {
     throw createError({
-      statusCode: 500,
+      statusCode: error.status ?? 523,
       statusMessage: error.message.includes('ENETUNREACH') ? 'Network Error' : error.message.includes('EHOSTUNREACH') ? 'An unexpected error occurred. Please contact support with Reference ID: B100' : error.message,
       data: error.response?.data || null,
     });
