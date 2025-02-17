@@ -30,6 +30,8 @@ const loading = ref<boolean>(false)
 const timeDiff = ref<number>(0)
 const mins = ref<number>()
 const secs = ref<number>()
+const useOTP = ref<boolean>(true)
+const banner = ref<boolean>(false)
   const rules = ref({
   required: (val: string) => {
     if (val) {
@@ -117,9 +119,11 @@ watch(
 
 const getOTP = async () => {
   loading.value = true;
+  banner.value = true;
 
   const requestData = {
     phone: phone.value,
+    name: name.value
   };
 
   try {
@@ -134,9 +138,13 @@ const getOTP = async () => {
     showOTP.value = true;
     timer();
   } catch (error: any) {
-    uiStore.alertText = error?.data?.data?.detail ?? error?.data?.data ?? error?.data?.message;
-    uiStore.alertStatus = false;
-    uiStore.alert = true;
+    if(error?.statusCode == 500) {
+      useOTP.value = false
+    } else {
+      uiStore.alertText = error?.data?.data?.detail ?? error?.data?.data ?? error?.data?.message;
+      uiStore.alertStatus = false;
+      uiStore.alert = true;
+    }
   } finally {
     loading.value = false;
   }
@@ -155,6 +163,7 @@ const verifyOTP = async () => {
       body: otpData,
       headers: { "API-KEY": runtimeConfig["public"]["apiKey"] },
     });
+    banner.value = false;
     uiStore.alertText = "OTP verified successfully";
     uiStore.alertStatus = true;
     uiStore.alert = true;
@@ -244,7 +253,18 @@ onMounted(async () => {
 </script>
 
 <template>
-  <v-container  style="margin-top: 72px;">
+  <v-container :style="smAndDown? 'margin-top: 40px;' : 'margin-top: 72px;'">
+    <v-alert
+    text="Dear Customer, your registration is almost complete! Enter the OTP sent to you via SMS to finalize the process."
+    title="Newgas Onboarding"
+    type="info"
+    variant="tonal"
+    :width="smAndDown ? '100%' : '50%'"
+    closable
+    class="mx-auto mb-12"
+    v-model="banner"
+    />
+
     <v-card max-width="700" class="mx-auto" elevation="2">
       <v-toolbar
         title="Customer Registration"
@@ -290,7 +310,7 @@ onMounted(async () => {
             <p class="text-body-1 mb-1">
               Phone Number <span class="text-error">*</span>
             </p>
-            <div class="d-flex ga-2">
+            <div class="d-flex ga-2" v-if="useOTP">
               <v-text-field
                 variant="outlined"
                 density="comfortable"
@@ -319,6 +339,16 @@ onMounted(async () => {
                   />
                 </template>
               </v-tooltip>
+            </div>
+            <div v-else>
+              <v-text-field
+                variant="outlined"
+                density="comfortable"
+                v-model="phone"
+                type="number"
+                :rules="[rules.phoneNumber]"
+                placeholder="Eg. 024xxxxxxx"
+              />
             </div>
             <div v-if="showOTP">
               <p class="text-body-1 mb-1">
@@ -359,7 +389,7 @@ onMounted(async () => {
               </div>
             </div>
           </div>
-          <div v-if="showFields">
+          <div v-if="showFields || !useOTP">
             <p class="text-body-1 mb-1">Digital Address</p>
             <v-text-field
               variant="outlined"
@@ -368,7 +398,7 @@ onMounted(async () => {
               placeholder="Eg. BS-xxxx-xxxx"
             />
           </div>
-          <div v-if="showFields">
+          <div v-if="showFields || !useOTP">
             <p class="text-body-1 mb-1">
               ID Type <span class="text-error">*</span>
             </p>
@@ -449,7 +479,7 @@ onMounted(async () => {
                             </div>
                         </div> -->
         </v-card-text>
-        <v-card-actions v-if="showFields" class="px-5 pb-5">
+        <v-card-actions v-if="showFields || !useOTP" class="px-5 pb-5">
           <v-btn
             type="submit"
             text="Submit"
