@@ -123,7 +123,7 @@ const getOTP = async () => {
 
   const requestData = {
     phone: phone.value,
-    name: name.value
+    name:  name.value
   };
 
   try {
@@ -325,7 +325,7 @@ onMounted(async () => {
                 text="Verify"
                 color="newgas"
                 :loading="loading"
-                :disabled="phone.length !== 10 || timeDiff > 0"
+                :disabled="phone.length !== 10 || timeDiff > 0 || !name"
                 @click="getOTP"
                 style="margin-top: 6px"
               />
