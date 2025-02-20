@@ -119,7 +119,6 @@ watch(
 
 const getOTP = async () => {
   loading.value = true;
-  banner.value = true;
 
   const requestData = {
     phone: phone.value,
@@ -132,6 +131,7 @@ const getOTP = async () => {
       body: requestData,
       headers: { "API-KEY": runtimeConfig["public"]["apiKey"] },
     });
+    banner.value = true;
     uiStore.alertText = "OTP sent successfully";
     uiStore.alertStatus = true;
     uiStore.alert = true;
