@@ -50,9 +50,9 @@ export default defineEventHandler(async (event) => {
 
   } catch (error: any) {
     throw createError({
-      statusCode: error.status ?? 523,
-      statusMessage: error.message.includes('ENETUNREACH') ? 'Network Error' : error.message.includes('EHOSTUNREACH') ? 'An unexpected error occurred. Please contact support with Reference ID: B100' : error.message,
-      data: error.response?.data.includes('DOCTYPE') ? error.response?.statusText : error.response?.data || null,
+      statusCode: error?.status ?? 523,
+      statusMessage: error?.message.includes('ENETUNREACH') ? 'Network Error' : error.message.includes('EHOSTUNREACH') ? 'An unexpected error occurred. Please contact support with Reference ID: B100' : error.message,
+      data: typeof error.response?.data === 'string' ? error.response?.statusText : error.response?.data || null,
     });
   }
 });
