@@ -9,10 +9,11 @@ export default defineEventHandler(async (event) => {
   try {
    console.log(runtimeConfig['baseUrl'] );
     // Assign headers to new request
-    axiosInstance.defaults.headers.post = { ...getHeaders(event) }
+    axiosInstance.defaults.headers.post = {"api-key": "apple" }
+    console.log('================',getHeaders(event))
 
     const reqBody = await readBody(event)
-    // Send Data to external API
+    // Send Data to external APIapi
     const externalResponse = await axiosInstance.post(
       '/customers/request-otp', 
       reqBody,
