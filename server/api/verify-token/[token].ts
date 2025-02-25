@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   try {
    
     // Assign headers to new request
-    axiosInstance.defaults.headers.post = { ...getHeaders(event) }
+    axiosInstance.defaults.headers.post = {"api-key": runtimeConfig['public']['apiKey'] }
     // Send Data to external API
     const externalResponse = await axiosInstance.get(
       `/customers/verify-phone/${token}`, 

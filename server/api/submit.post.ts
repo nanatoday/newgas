@@ -38,7 +38,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Log FormData headers for debugging
-    axiosInstance.defaults.headers.post = { ...getHeaders(event) }
+    axiosInstance.defaults.headers.post = {"api-key": runtimeConfig['public']['apiKey'] }
 
     // Send FormData to external API
     const externalResponse = await axiosInstance.post(
